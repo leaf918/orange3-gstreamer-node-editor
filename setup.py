@@ -7,7 +7,7 @@ from setuptools import setup, find_packages
 
 NAME = "Orange3 Gstreamer Node Editor"
 
-VERSION = "0.0.1"
+VERSION = "0.1.0"
 
 AUTHOR = 'Leef Lee'
 AUTHOR_EMAIL = 'leef918@gmail.com'

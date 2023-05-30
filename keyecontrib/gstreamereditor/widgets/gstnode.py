@@ -27,6 +27,7 @@ class gstplugin(OWWidget, ConcurrentWidgetMixin):
     name = "gstplugin"
     icon = "icons/plugin.svg"
     plugin_id: int = Setting(0)
+    setting_property: dict = Setting({})
 
     def __init__(self):
         OWWidget.__init__(self)
@@ -73,26 +74,35 @@ class gstplugin(OWWidget, ConcurrentWidgetMixin):
             v = self.gui_properties[gui_name].text()
             if len(v) > 0:
                 self.property_map[gui_name] = v
+                self.setting_property[gui_name] = v
+
         #  commit change to pipeline flow.
         self.commit()
 
     def plugin_id_changed(self):
+        # reset property setting values
+        self.setting_property = {}
         for child in self.propertyBox.findChildren(QtWidgets.QWidget):
             child.close()
             child.deleteLater()
             child = None
         self.gui_properties = {}
-        for pp in gst_plugs_loader.defaults().loc[self.plugin_id]['properties'].split(','):
+        for prop_title in gst_plugs_loader.defaults().loc[self.plugin_id]['properties'].split(','):
+            val_setting = ''
+            try:
+                val_setting = self.setting_property[prop_title]
+            except:
+                pass
             self.cur_property_lineedit = gui.lineEdit(
                 self.propertyBox,
                 self,
-                value=None,
-                label=pp,
+                value=val_setting,
+                label=prop_title,
                 callback=self.property_changed
             )
-            self.gui_properties[pp] = self.cur_property_lineedit
-        # self.graph_name = self.short_name = self.name = gst_plugs_loader.defaults().loc[self.plugin_id]['title']
-        self.setCaption(self.name)
+            self.gui_properties[prop_title] = self.cur_property_lineedit
+
+        self.name = gst_plugs_loader.defaults().loc[self.plugin_id]['title']
 
     def run_ppl(self):
         print('execute pipeline')
@@ -112,15 +122,9 @@ class gstplugin(OWWidget, ConcurrentWidgetMixin):
 
     def on_exception(self, ex: Exception):
         self.Error.general_error(ex)
-        # self.bt_save.setText("Save")
         self.reset_queue()
 
     def _update_properties_list(self):
-        """
-        Updates messages.
-        """
-        # self.Error.no_file_name(
-        #     shown=not self.dirname and self.auto_save)
         self.plugin_source_attr.setModel(VariableListModel(gst_plugs_loader.defaults()['title']))
         self.plugin_id_changed()
 
