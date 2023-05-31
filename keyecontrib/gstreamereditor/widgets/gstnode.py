@@ -28,12 +28,12 @@ class gstplugin(OWWidget, ConcurrentWidgetMixin):
     icon = "icons/plugin.svg"
     plugin_id: int = Setting(0)
     setting_property: dict = Setting({})
+    ahead_nodes: list = Setting([])
 
     def __init__(self):
         OWWidget.__init__(self)
         ConcurrentWidgetMixin.__init__(self)
         self.plugin_source_list = None
-        self.ahead_nodes = []
         self.gui_properties = {}
         self.cur_property_values = {}
 
@@ -59,10 +59,15 @@ class gstplugin(OWWidget, ConcurrentWidgetMixin):
 
     @Inputs.data
     def dataset(self, data):
+        print("input data update ", data)
         self.ahead_nodes = data
 
     # @gui.deferred
     def commit(self):
+        print('this is node ,pre nodes %s,cur node %s' % (self.ahead_nodes, {
+            'title': self.name,
+            'property': self.cur_property_values
+        }))
         self.Outputs.data.send(self.ahead_nodes + [{
             'title': self.name,
             'property': self.cur_property_values
@@ -105,12 +110,6 @@ class gstplugin(OWWidget, ConcurrentWidgetMixin):
             cur_property_lineedit.setText(val_setting)
 
         self.name = gst_plugs_loader.defaults().loc[self.plugin_id]['title']
-
-    def run_ppl(self):
-        print('execute pipeline')
-
-    def save_localhost_plugins(self):
-        print('save_localhost_plugins')
 
     def on_partial_result(self):
         # self.paths_queue = result.paths

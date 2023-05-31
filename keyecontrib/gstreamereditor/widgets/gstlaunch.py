@@ -63,6 +63,15 @@ class gstlaunch(OWWidget, ConcurrentWidgetMixin):
         print('execute pipeline')
         print('-' * 12)
         print(self.ahead_nodes)
+        cmd_gstlaunch = 'gst-inspect-1.0 '
+        for cell in self.ahead_nodes:
+            cmd = ''
+            cmd += '%s ' % cell['title']
+            cmd += ' '.join(['%s=%s ' % (p, cell['property'][p]) for p in cell['property']])
+            cmd += '! '
+            print('>><< ',cmd)
+            cmd_gstlaunch += cmd
+        print(cmd_gstlaunch)
 
     def save_localhost_plugins(self):
         print('save_localhost_plugins')
