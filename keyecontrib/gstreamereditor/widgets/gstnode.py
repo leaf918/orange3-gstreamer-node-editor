@@ -26,7 +26,7 @@ class gstplugin(OWWidget, ConcurrentWidgetMixin):
     # and not shown in the menu.
     name = "gstplugin"
     icon = "icons/plugin.svg"
-    plugin_id: int = Setting(0)
+    setting_plugin_id: int = Setting(0)
     setting_property: dict = Setting({})
     ahead_nodes: list = Setting([])
 
@@ -46,7 +46,7 @@ class gstplugin(OWWidget, ConcurrentWidgetMixin):
         self.plugin_source_attr = gui.comboBox(
             widget=hbox_plugins_source,
             master=self,
-            value='plugin_id',
+            value='setting_plugin_id',
             label='Plugin Name',
             orientation=Qt.Horizontal,
             callback=self.plugin_id_changed
@@ -93,7 +93,7 @@ class gstplugin(OWWidget, ConcurrentWidgetMixin):
             child.deleteLater()
             child = None
         self.gui_properties = {}
-        for prop_title in gst_plugs_loader.defaults().loc[self.plugin_id]['properties'].split(','):
+        for prop_title in gst_plugs_loader.defaults().loc[self.setting_plugin_id]['properties'].split(','):
             val_setting = ''
             try:
                 val_setting = self.setting_property[prop_title]
@@ -109,7 +109,7 @@ class gstplugin(OWWidget, ConcurrentWidgetMixin):
             self.gui_properties[prop_title] = cur_property_lineedit
             cur_property_lineedit.setText(val_setting)
 
-        self.name = gst_plugs_loader.defaults().loc[self.plugin_id]['title']
+        self.name = gst_plugs_loader.defaults().loc[self.setting_plugin_id]['title']
 
     def on_partial_result(self):
         # self.paths_queue = result.paths
@@ -126,8 +126,10 @@ class gstplugin(OWWidget, ConcurrentWidgetMixin):
         self.reset_queue()
 
     def _update_properties_list(self):
-        print(" restore property ", self.setting_property)
+        print(" restore property ", self.setting_property, self.setting_plugin_id)
         self.plugin_source_attr.setModel(VariableListModel(gst_plugs_loader.defaults()['title']))
+        # todo set index after setModel invoking.
+        self.plugin_source_attr.setCurrentIndex(self.setting_plugin_id)
         self.plugin_id_changed(from_restore=True)
 
     def clear(self):
