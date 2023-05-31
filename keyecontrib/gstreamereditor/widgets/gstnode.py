@@ -35,7 +35,7 @@ class gstplugin(OWWidget, ConcurrentWidgetMixin):
         self.plugin_source_list = None
         self.ahead_nodes = []
         self.gui_properties = {}
-        self.property_map = {}
+        self.cur_property_values = {}
 
         # create grid
         grid = QGridLayout()
@@ -65,23 +65,24 @@ class gstplugin(OWWidget, ConcurrentWidgetMixin):
     def commit(self):
         self.Outputs.data.send(self.ahead_nodes + [{
             'title': self.name,
-            'property': self.property_map
+            'property': self.cur_property_values
         }])
 
     def property_changed(self):
-        self.property_map = {}
+        self.cur_property_values = {}
         for gui_name in self.gui_properties:
             v = self.gui_properties[gui_name].text()
             if len(v) > 0:
-                self.property_map[gui_name] = v
+                self.cur_property_values[gui_name] = v
                 self.setting_property[gui_name] = v
 
         #  commit change to pipeline flow.
         self.commit()
 
-    def plugin_id_changed(self):
+    def plugin_id_changed(self, from_restore=False):
         # reset property setting values
-        self.setting_property = {}
+        if not from_restore:
+            self.setting_property = {}
         for child in self.propertyBox.findChildren(QtWidgets.QWidget):
             child.close()
             child.deleteLater()
@@ -93,14 +94,15 @@ class gstplugin(OWWidget, ConcurrentWidgetMixin):
                 val_setting = self.setting_property[prop_title]
             except:
                 pass
-            self.cur_property_lineedit = gui.lineEdit(
+            cur_property_lineedit = gui.lineEdit(
                 self.propertyBox,
                 self,
-                value=val_setting,
+                value=None,
                 label=prop_title,
                 callback=self.property_changed
             )
-            self.gui_properties[prop_title] = self.cur_property_lineedit
+            self.gui_properties[prop_title] = cur_property_lineedit
+            cur_property_lineedit.setText(val_setting)
 
         self.name = gst_plugs_loader.defaults().loc[self.plugin_id]['title']
 
@@ -125,8 +127,9 @@ class gstplugin(OWWidget, ConcurrentWidgetMixin):
         self.reset_queue()
 
     def _update_properties_list(self):
+        print(" restore property ", self.setting_property)
         self.plugin_source_attr.setModel(VariableListModel(gst_plugs_loader.defaults()['title']))
-        self.plugin_id_changed()
+        self.plugin_id_changed(from_restore=True)
 
     def clear(self):
         super().clear()
