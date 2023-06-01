@@ -23,7 +23,7 @@ class gstlaunch(OWWidget, ConcurrentWidgetMixin):
         OWWidget.__init__(self)
         ConcurrentWidgetMixin.__init__(self)
         self.plugin_source_list = None
-        self.ahead_nodes = None
+        self.ahead_nodes = []
         # create grid
         grid = QGridLayout()
         gui.widgetBox(self.controlArea, orientation=grid)
@@ -69,7 +69,6 @@ class gstlaunch(OWWidget, ConcurrentWidgetMixin):
             cmd += '%s ' % cell['title']
             cmd += ' '.join(['%s=%s ' % (p, cell['property'][p]) for p in cell['property']])
             cmd += '! '
-            print('>><< ',cmd)
             cmd_gstlaunch += cmd
         print(cmd_gstlaunch)
 

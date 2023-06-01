@@ -60,11 +60,12 @@ class gstplugin(OWWidget, ConcurrentWidgetMixin):
     @Inputs.data
     def dataset(self, data):
         print("input data update ", data)
-        self.ahead_nodes = data
+        self.ahead_nodes = data if data is not None else []
+        self.commit()
 
     # @gui.deferred
     def commit(self):
-        print('this is node ,pre nodes %s,cur node %s' % (self.ahead_nodes, {
+        print('\n pre : %s \n cur %s \n' % (self.ahead_nodes, {
             'title': self.name,
             'property': self.cur_property_values
         }))
@@ -88,6 +89,9 @@ class gstplugin(OWWidget, ConcurrentWidgetMixin):
         # reset property setting values
         if not from_restore:
             self.setting_property = {}
+        else:
+            self.ahead_nodes = []
+
         for child in self.propertyBox.findChildren(QtWidgets.QWidget):
             child.close()
             child.deleteLater()
@@ -128,7 +132,7 @@ class gstplugin(OWWidget, ConcurrentWidgetMixin):
     def _update_properties_list(self):
         print(" restore property ", self.setting_property, self.setting_plugin_id)
         self.plugin_source_attr.setModel(VariableListModel(gst_plugs_loader.defaults()['title']))
-        # todo set index after setModel invoking.
+        # set index after setModel invoking.
         self.plugin_source_attr.setCurrentIndex(self.setting_plugin_id)
         self.plugin_id_changed(from_restore=True)
 
