@@ -60,9 +60,9 @@ class gstlaunch(OWWidget, ConcurrentWidgetMixin):
             self.run_ppl()
 
     def run_ppl(self):
-        print('execute pipeline')
-        print('-' * 12)
-        print(self.ahead_nodes)
+        # print('execute pipeline')
+        # print('-' * 12)
+        # print(self.ahead_nodes)
         cmd_gstlaunch = 'gst-inspect-1.0 '
         for cell in self.ahead_nodes:
             cmd = ''

@@ -21,7 +21,7 @@ class gstplugin(OWWidget, ConcurrentWidgetMixin):
         # selected_data = Output("Selected Images", Orange.data.Table)
         data = Output("pipeline", list, auto_summary=False)
 
-    want_main_area = False
+    want_main_area = True
     resizing_enabled = False
 
     # Widget needs a name, or it is considered an abstract widget
@@ -59,21 +59,26 @@ class gstplugin(OWWidget, ConcurrentWidgetMixin):
         # scroll_area = VerticalScrollArea(self.controlArea)
         # scroll_area.setSizePolicy(QSizePolicy.MinimumExpanding,
         #                           QSizePolicy.Preferred)
-
         self.propertyBox = gui.vBox(self.controlArea, "Property")
-        self.qf = QtWidgets.QFormLayout()
-        # for i in range(4): self.qf.addRow("Property", QtWidgets.QLineEdit("x"))
-        self.qsa = QtWidgets.QScrollArea()
-        self.qsa.setMinimumHeight(180)
-        myw = QtWidgets.QWidget()
-        myw.setLayout(self.qf)
-        self.qsa.setWidget(myw)
-        self.propertyBox.layout().addWidget(self.qsa)
         # bottom GUI
+        qf = QtWidgets.QFormLayout()
+        for i in range(88): qf.addRow("Property", QtWidgets.QLineEdit("x"))
+        qsa = QtWidgets.QScrollArea()
+        ql = QtWidgets.QListWidget()
+        for i in range(88): ql.addItem('abc')
+        # qsa.setLayout(qf)
+        myw = QtWidgets.QWidget()
+        myw.setLayout(qf)
+        qsa.setWidget(myw)
+
+        self.propertyBox.layout().addWidget(qsa)
+        # self.propertyBox.layout().addLayout(qf)
+        # sa.addLayout(qf)
         # gui.rubber(self.controlArea)
         # gui.auto_commit(self.buttonsArea, self, 'auto_commit', 'Apply')
         self.adjustSize()
-        self._update_properties_list()
+
+        # self._update_properties_list()
 
     @Inputs.data
     def dataset(self, data):
@@ -110,16 +115,10 @@ class gstplugin(OWWidget, ConcurrentWidgetMixin):
         else:
             self.ahead_nodes = []
 
-        # for child in self.propertyBox.findChildren(QtWidgets.QWidget):
-        #     child.close()
-        #     child.deleteLater()
-        #     child = None
-        # while self.qf.count()>0:
-        #     child=self.qf.takeAt(0).widget()
-        #     child.close()
-        #     child.deleteLater()
-        #     child=None
-        cur_qf = QtWidgets.QFormLayout()
+        for child in self.propertyBox.findChildren(QtWidgets.QWidget):
+            child.close()
+            child.deleteLater()
+            child = None
         self.gui_properties = {}
         for prop_title in gst_plugs_loader.defaults().loc[self.setting_plugin_id]['properties'].split(','):
             val_setting = ''
@@ -127,21 +126,15 @@ class gstplugin(OWWidget, ConcurrentWidgetMixin):
                 val_setting = self.setting_property[prop_title]
             except:
                 pass
-            cur_line_edit=QtWidgets.QLineEdit(val_setting)
-            # print(">> qformlayout ",self.qf.count())
-            cur_qf.addRow(prop_title, QtWidgets.QLineEdit('cc'))
-            # cur_property_lineedit = gui.lineEdit(
-            #     self.propertyBox,
-            #     self,
-            #     value=None,
-            #     label=prop_title,
-            #     callback=self.property_changed
-            # )
-            self.gui_properties[prop_title] = cur_line_edit
-            # cur_property_lineedit.setText(val_setting)
-        myw = QtWidgets.QWidget()
-        myw.setLayout(cur_qf)
-        self.qsa.setWidget(myw)
+            cur_property_lineedit = gui.lineEdit(
+                self.propertyBox,
+                self,
+                value=None,
+                label=prop_title,
+                callback=self.property_changed
+            )
+            self.gui_properties[prop_title] = cur_property_lineedit
+            cur_property_lineedit.setText(val_setting)
 
         self.name = gst_plugs_loader.defaults().loc[self.setting_plugin_id]['title']
 
