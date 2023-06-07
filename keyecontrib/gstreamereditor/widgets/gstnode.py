@@ -8,7 +8,7 @@ from Orange.widgets.utils.concurrent import ConcurrentWidgetMixin
 from Orange.widgets.widget import Input, Output
 from Orange.widgets.widget import OWWidget
 from PyQt5.QtWidgets import QSizePolicy
-from orangewidget.gui import VerticalScrollArea
+from orangewidget.gui import VerticalScrollArea, LineEditWFocusOut
 
 from keyecontrib.gstreamereditor.util import gst_plugs_loader
 
@@ -127,9 +127,15 @@ class gstplugin(OWWidget, ConcurrentWidgetMixin):
                 val_setting = self.setting_property[prop_title]
             except:
                 pass
-            cur_line_edit=QtWidgets.QLineEdit(val_setting)
+            # cur_line_edit=QtWidgets.QLineEdit(val_setting)
             # print(">> qformlayout ",self.qf.count())
-            cur_qf.addRow(prop_title, QtWidgets.QLineEdit('cc'))
+            cur_line_edit = LineEditWFocusOut(None,
+                                              self.property_changed,
+                                              None)
+            cur_line_edit.setText(str(val_setting))
+
+            cur_qf.addRow(prop_title,
+                          cur_line_edit)
             # cur_property_lineedit = gui.lineEdit(
             #     self.propertyBox,
             #     self,
