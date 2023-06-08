@@ -121,30 +121,34 @@ class gstplugin(OWWidget, ConcurrentWidgetMixin):
         #     child=None
         cur_qf = QtWidgets.QFormLayout()
         self.gui_properties = {}
-        for prop_title in gst_plugs_loader.defaults().loc[self.setting_plugin_id]['properties'].split(','):
-            val_setting = ''
-            try:
-                val_setting = self.setting_property[prop_title]
-            except:
-                pass
-            # cur_line_edit=QtWidgets.QLineEdit(val_setting)
-            # print(">> qformlayout ",self.qf.count())
-            cur_line_edit = LineEditWFocusOut(None,
-                                              self.property_changed,
-                                              None)
-            cur_line_edit.setText(str(val_setting))
+        try:
+            for prop_title in gst_plugs_loader.defaults().iloc[self.setting_plugin_id]['properties'].split(','):
+                val_setting = ''
+                try:
+                    val_setting = self.setting_property[prop_title]
+                except:
+                    pass
+                # cur_line_edit=QtWidgets.QLineEdit(val_setting)
+                # print(">> qformlayout ",self.qf.count())
+                cur_line_edit = LineEditWFocusOut(None,
+                                                  self.property_changed,
+                                                  None)
+                cur_line_edit.setText(str(val_setting))
 
-            cur_qf.addRow(prop_title,
-                          cur_line_edit)
-            # cur_property_lineedit = gui.lineEdit(
-            #     self.propertyBox,
-            #     self,
-            #     value=None,
-            #     label=prop_title,
-            #     callback=self.property_changed
-            # )
-            self.gui_properties[prop_title] = cur_line_edit
-            # cur_property_lineedit.setText(val_setting)
+                cur_qf.addRow(prop_title,
+                              cur_line_edit)
+                # cur_property_lineedit = gui.lineEdit(
+                #     self.propertyBox,
+                #     self,
+                #     value=None,
+                #     label=prop_title,
+                #     callback=self.property_changed
+                # )
+                self.gui_properties[prop_title] = cur_line_edit
+                # cur_property_lineedit.setText(val_setting)
+        except:
+            # property may be nan
+            pass
         myw = QtWidgets.QWidget()
         myw.setLayout(cur_qf)
         self.qsa.setWidget(myw)
